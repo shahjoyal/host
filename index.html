@@ -871,58 +871,131 @@
       }).join('');
     }
 
-    function renderBuzzerView() {
-      const { currentRound, buzzerWinnerName } = gameState;
-      const q = questions[currentRound - 1] || {};
-      const qText = q.text || q; // backward compat
+    // function renderBuzzerView() {
+    //   const { currentRound, buzzerWinnerName } = gameState;
+    //   const q = questions[currentRound - 1] || {};
+    //   const qText = q.text || q; // backward compat
 
-      if (qText) {
-        document.getElementById('current-question-display').textContent = `Round ${currentRound}`;
-        document.getElementById('question-card-text').textContent = qText;
-        document.getElementById('question-card-text').style.display = '';
-      } else {
-        document.getElementById('current-question-display').textContent = `Round ${currentRound} — Buzzer`;
-        document.getElementById('question-card-text').style.display = 'none';
-      }
+    //   if (qText) {
+    //     document.getElementById('current-question-display').textContent = `Round ${currentRound}`;
+    //     document.getElementById('question-card-text').textContent = qText;
+    //     document.getElementById('question-card-text').style.display = '';
+    //   } else {
+    //     document.getElementById('current-question-display').textContent = `Round ${currentRound} — Buzzer`;
+    //     document.getElementById('question-card-text').style.display = 'none';
+    //   }
 
-      // Media display
-      const mediaWrap = document.getElementById('q-media-display');
-      const mediaImg = document.getElementById('q-media-img');
-      const mediaAudio = document.getElementById('q-media-audio');
-      const mediaLabel = document.getElementById('q-media-label');
+    //   // Media display
+    //   const mediaWrap = document.getElementById('q-media-display');
+    //   const mediaImg = document.getElementById('q-media-img');
+    //   const mediaAudio = document.getElementById('q-media-audio');
+    //   const mediaLabel = document.getElementById('q-media-label');
 
-      if (q.mediaUrl) {
-        mediaWrap.classList.add('show');
-        if (q.mediaType === 'image') {
-          mediaImg.src = q.mediaUrl; mediaImg.style.display = '';
-          mediaAudio.style.display = 'none'; mediaAudio.src = '';
-          mediaLabel.textContent = '🖼️ Guess the Photo';
-        } else if (q.mediaType === 'audio') {
-          mediaAudio.src = q.mediaUrl; mediaAudio.style.display = '';
-          mediaImg.style.display = 'none'; mediaImg.src = '';
-          mediaLabel.textContent = '🎵 Guess the Tune';
-        }
-      } else {
-        mediaWrap.classList.remove('show');
-        mediaImg.style.display = 'none'; mediaAudio.style.display = 'none';
-      }
+    //   if (q.mediaUrl) {
+    //     mediaWrap.classList.add('show');
+    //     if (q.mediaType === 'image') {
+    //       mediaImg.src = q.mediaUrl; mediaImg.style.display = '';
+    //       mediaAudio.style.display = 'none'; mediaAudio.src = '';
+    //       mediaLabel.textContent = '🖼️ Guess the Photo';
+    //     } else if (q.mediaType === 'audio') {
+    //       mediaAudio.src = q.mediaUrl; mediaAudio.style.display = '';
+    //       mediaImg.style.display = 'none'; mediaImg.src = '';
+    //       mediaLabel.textContent = '🎵 Guess the Tune';
+    //     }
+    //   } else {
+    //     mediaWrap.classList.remove('show');
+    //     mediaImg.style.display = 'none'; mediaAudio.style.display = 'none';
+    //   }
 
-      // Enter fullscreen mode for buzzer
-      document.querySelector('.app').classList.add('buzzer-fullscreen');
+    //   // Enter fullscreen mode for buzzer
+    //   document.querySelector('.app').classList.add('buzzer-fullscreen');
 
-      // Scoreboard
-      const sb = document.getElementById('scoreboard');
-      sb.innerHTML = players.map(p => {
-        const isWinner = buzzerWinnerName === p.name;
-        return `
-          <div class="score-card ${isWinner ? 'winner' : ''}">
-            <div class="sc-name">${esc(p.name)}${isWinner ? ' 🔔' : ''}</div>
-            <div class="sc-score">${p.score}</div>
-            ${isWinner ? '<div class="sc-badge">First!</div>' : ''}
-          </div>
-        `;
-      }).join('');
-    }
+    //   // Scoreboard
+    //   const sb = document.getElementById('scoreboard');
+    //   sb.innerHTML = players.map(p => {
+    //     const isWinner = buzzerWinnerName === p.name;
+    //     return `
+    //       <div class="score-card ${isWinner ? 'winner' : ''}">
+    //         <div class="sc-name">${esc(p.name)}${isWinner ? ' 🔔' : ''}</div>
+    //         <div class="sc-score">${p.score}</div>
+    //         ${isWinner ? '<div class="sc-badge">First!</div>' : ''}
+    //       </div>
+    //     `;
+    //   }).join('');
+    // }
+
+function renderBuzzerView() {
+  const { currentRound, buzzerWinnerName } = gameState;
+  const q = questions[currentRound - 1] || {};
+  const qText = q.text || q;
+
+  if (qText) {
+    document.getElementById('current-question-display').textContent = `Round ${currentRound}`;
+    document.getElementById('question-card-text').textContent = qText;
+    document.getElementById('question-card-text').style.display = '';
+  } else {
+    document.getElementById('current-question-display').textContent = `Round ${currentRound} — Buzzer`;
+    document.getElementById('question-card-text').style.display = 'none';
+  }
+
+  const mediaWrap = document.getElementById('q-media-display');
+  const mediaImg = document.getElementById('q-media-img');
+  const mediaAudio = document.getElementById('q-media-audio');
+  const mediaLabel = document.getElementById('q-media-label');
+
+  const imgUrl = `/q-media/q${currentRound}.jpg`;
+  const audioUrl = `/q-media/q${currentRound}.mp3`;
+
+  mediaWrap.classList.remove('show');
+  mediaImg.style.display = 'none';
+  mediaAudio.style.display = 'none';
+  mediaImg.src = '';
+  mediaAudio.src = '';
+
+  const showNoMedia = () => {
+    mediaWrap.classList.remove('show');
+    mediaImg.style.display = 'none';
+    mediaAudio.style.display = 'none';
+  };
+
+  const showImage = () => {
+    mediaWrap.classList.add('show');
+    mediaLabel.textContent = '🖼️ Guess the Photo';
+    mediaImg.style.display = '';
+    mediaAudio.style.display = 'none';
+  };
+
+  const showAudio = () => {
+    mediaWrap.classList.add('show');
+    mediaLabel.textContent = '🎵 Guess the Tune';
+    mediaImg.style.display = 'none';
+    mediaAudio.style.display = '';
+  };
+
+  mediaImg.onload = showImage;
+  mediaImg.onerror = () => {
+    mediaImg.style.display = 'none';
+    mediaAudio.onloadeddata = showAudio;
+    mediaAudio.onerror = showNoMedia;
+    mediaAudio.src = audioUrl + '?v=' + Date.now();
+  };
+
+  mediaImg.src = imgUrl + '?v=' + Date.now();
+
+  document.querySelector('.app').classList.add('buzzer-fullscreen');
+
+  const sb = document.getElementById('scoreboard');
+  sb.innerHTML = players.map(p => {
+    const isWinner = buzzerWinnerName === p.name;
+    return `
+      <div class="score-card ${isWinner ? 'winner' : ''}">
+        <div class="sc-name">${esc(p.name)}${isWinner ? ' 🔔' : ''}</div>
+        <div class="sc-score">${p.score}</div>
+        ${isWinner ? '<div class="sc-badge">First!</div>' : ''}
+      </div>
+    `;
+  }).join('');
+}
 
     function exitFullscreen() {
       document.querySelector('.app').classList.remove('buzzer-fullscreen');

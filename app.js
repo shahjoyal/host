@@ -276,3 +276,6 @@ app.get('*', (req, res) => {
 
 const PORT = process.env.PORT_HOST || 3002;
 app.listen(PORT, () => console.log(`🎬 Host app running on port ${PORT}`));
+
+
+// module.exports = app;
