@@ -274,8 +274,8 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-const PORT = process.env.PORT_HOST || 3002;
-app.listen(PORT, () => console.log(`🎬 Host app running on port ${PORT}`));
+// const PORT = process.env.PORT_HOST || 3002;
+// app.listen(PORT, () => console.log(`🎬 Host app running on port ${PORT}`));
 
 
-// module.exports = app;
+module.exports = app;
